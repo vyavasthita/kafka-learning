@@ -1,39 +1,114 @@
 version: '3.8'
 
 services:
-  zookeeper:
+  zookeeper-1:
     image: confluentinc/cp-zookeeper:7.0.1
-    hostname: zookeeper
-    container_name: zookeeper
+    hostname: zookeeper-1
+    container_name: zookeeper-1
     ports:
-      - "2181:2181"
+      - "22181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
     volumes:
-      - ./zk-data:/var/lib/zookeeper/data
-      - ./zk-log:/var/lib/zookeeper/log
-  kafka:
-    image: confluentinc/cp-kafka:7.0.1
-    hostname: kafka
-    container_name: kafka
-    depends_on:
-      - zookeeper
+      - ./zk-data/zk-1:/var/lib/zookeeper/data
+      - ./zk-log/zk-1:/var/lib/zookeeper/log
+  zookeeper-2:
+    image: confluentinc/cp-zookeeper:7.0.1
+    hostname: zookeeper-2
+    container_name: zookeeper-2
     ports:
-      - "9092:9092"
+      - "32181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 2
+    volumes:
+      - ./zk-data/zk-2:/var/lib/zookeeper/data
+      - ./zk-log/zk-2:/var/lib/zookeeper/log
+  zookeeper-3:
+    image: confluentinc/cp-zookeeper:7.0.1
+    hostname: zookeeper-3
+    container_name: zookeeper-3
+    ports:
+      - "42181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 2
+    volumes:
+      - ./zk-data/zk-3:/var/lib/zookeeper/data
+      - ./zk-log/zk-3:/var/lib/zookeeper/log
+  kafka-1:
+    image: confluentinc/cp-kafka:7.0.1
+    hostname: kafka-1
+    container_name: kafka-1
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_JMX_PORT: 9999
+      # KAFKA_JMX_PORT: 9999
     volumes:
-      - ./kafka-data:/var/lib/kafka/data
-networks:
-  default:
-    name: kafka-network
+      - ./kafka-data/kafka-1:/var/lib/kafka/data
+  kafka-2:
+    image: confluentinc/cp-kafka:7.0.1
+    hostname: kafka-2
+    container_name: kafka-2
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "39092:39092"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:39092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # KAFKA_JMX_PORT: 9999
+    volumes:
+      - ./kafka-data/kafka-2:/var/lib/kafka/data
+  kafka-3:
+    image: confluentinc/cp-kafka:7.0.1
+    hostname: kafka-3
+    container_name: kafka-3
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    ports:
+      - "49092:49092"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:49092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      # KAFKA_JMX_PORT: 9999
+    volumes:
+      - ./kafka-data/kafka-3:/var/lib/kafka/data
+# networks:
+#   default:
+#     name: kafka-network
