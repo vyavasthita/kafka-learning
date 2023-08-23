@@ -5,6 +5,7 @@ services:
     image: confluentinc/cp-zookeeper:7.0.1
     hostname: zookeeper-1
     container_name: zookeeper-1
+    user: root
     ports:
       - "22181:2181"
     environment:
@@ -12,8 +13,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
     volumes:
-      - ./zk-data/zk-1:/var/lib/zookeeper/data
-      - ./zk-log/zk-1:/var/lib/zookeeper/log
+      - ./zk-data/zk-1/data:/var/lib/zookeeper/data
+      - ./zk-log/zk-1/log:/var/lib/zookeeper/log
   zookeeper-2:
     image: confluentinc/cp-zookeeper:7.0.1
     hostname: zookeeper-2
@@ -24,9 +25,10 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
+    user: root
     volumes:
-      - ./zk-data/zk-2:/var/lib/zookeeper/data
-      - ./zk-log/zk-2:/var/lib/zookeeper/log
+      - ./zk-data/zk-2/data:/var/lib/zookeeper/data
+      - ./zk-log/zk-2/log:/var/lib/zookeeper/log
   zookeeper-3:
     image: confluentinc/cp-zookeeper:7.0.1
     hostname: zookeeper-3
@@ -37,9 +39,10 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
+    user: root
     volumes:
-      - ./zk-data/zk-3:/var/lib/zookeeper/data
-      - ./zk-log/zk-3:/var/lib/zookeeper/log
+      - ./zk-data/zk-3/data:/var/lib/zookeeper/data
+      - ./zk-log/zk-3/log:/var/lib/zookeeper/log
   kafka-1:
     image: confluentinc/cp-kafka:7.0.1
     hostname: kafka-1
@@ -60,8 +63,9 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    user: root
     volumes:
-      - ./kafka-data/kafka-1:/var/lib/kafka/data
+      - ./kafka-data/kafka-1/data:/var/lib/kafka/data
   kafka-2:
     image: confluentinc/cp-kafka:7.0.1
     hostname: kafka-2
@@ -82,8 +86,9 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    user: root
     volumes:
-      - ./kafka-data/kafka-2:/var/lib/kafka/data
+      - ./kafka-data/kafka-2/data:/var/lib/kafka/data
   kafka-3:
     image: confluentinc/cp-kafka:7.0.1
     hostname: kafka-3
@@ -104,8 +109,9 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+    user: root
     volumes:
-      - ./kafka-data/kafka-3:/var/lib/kafka/data
+      - ./kafka-data/kafka-3/data:/var/lib/kafka/data
 networks:
     kafka-network:
        driver: bridge
