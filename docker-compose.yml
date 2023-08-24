@@ -112,6 +112,15 @@ services:
     user: root
     volumes:
       - ./kafka-data/kafka-3/data:/var/lib/kafka/data
+  app:
+    build: ./kafka_app
+    container_name: app
+    ports:
+      - 5001:5001
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
 networks:
     kafka-network:
        driver: bridge
