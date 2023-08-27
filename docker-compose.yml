@@ -1,5 +1,10 @@
 version: '3.8'
 
+networks:
+  kafka-learning:
+    name: kafka-learning
+    driver: bridge
+
 services:
   zookeeper-1:
     image: confluentinc/cp-zookeeper:7.0.1
@@ -9,9 +14,18 @@ services:
     ports:
       - "22181:2181"
     environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
+    networks:
+      - kafka-learning
+    healthcheck:
+      test: nc -z localhost 2181 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes:
       - ./zk-data/zk-1/data:/var/lib/zookeeper/data
       - ./zk-log/zk-1/log:/var/lib/zookeeper/log
@@ -19,13 +33,22 @@ services:
     image: confluentinc/cp-zookeeper:7.0.1
     hostname: zookeeper-2
     container_name: zookeeper-2
+    user: root
     ports:
       - "32181:2181"
     environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
-    user: root
+    networks:
+      - kafka-learning
+    healthcheck:
+      test: nc -z localhost 2181 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes:
       - ./zk-data/zk-2/data:/var/lib/zookeeper/data
       - ./zk-log/zk-2/log:/var/lib/zookeeper/log
@@ -33,13 +56,22 @@ services:
     image: confluentinc/cp-zookeeper:7.0.1
     hostname: zookeeper-3
     container_name: zookeeper-3
+    user: root
     ports:
       - "42181:2181"
     environment:
+      ALLOW_ANONYMOUS_LOGIN: yes
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
-    user: root
+    networks:
+      - kafka-learning
+    healthcheck:
+      test: nc -z localhost 2181 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     volumes:
       - ./zk-data/zk-3/data:/var/lib/zookeeper/data
       - ./zk-log/zk-3/log:/var/lib/zookeeper/log
@@ -48,79 +80,117 @@ services:
     hostname: kafka-1
     container_name: kafka-1
     depends_on:
-      - zookeeper-1
-      - zookeeper-2
-      - zookeeper-3
+      zookeeper-1:
+        condition: service_healthy
+      zookeeper-2:
+        condition: service_healthy
+      zookeeper-3:
+        condition: service_healthy
     ports:
-      - "29092:29092"
+      - "9093:9093"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:9093
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     user: root
+    networks:
+      - kafka-learning
     volumes:
       - ./kafka-data/kafka-1/data:/var/lib/kafka/data
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 5
   kafka-2:
     image: confluentinc/cp-kafka:7.0.1
     hostname: kafka-2
     container_name: kafka-2
     depends_on:
-      - zookeeper-1
-      - zookeeper-2
-      - zookeeper-3
+      zookeeper-1:
+        condition: service_healthy
+      zookeeper-2:
+        condition: service_healthy
+      zookeeper-3:
+        condition: service_healthy
     ports:
-      - "39092:39092"
+      - "9094:9094"
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092,PLAINTEXT_HOST://localhost:39092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:9094
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     user: root
+    networks:
+      - kafka-learning
     volumes:
       - ./kafka-data/kafka-2/data:/var/lib/kafka/data
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 5
   kafka-3:
     image: confluentinc/cp-kafka:7.0.1
     hostname: kafka-3
     container_name: kafka-3
     depends_on:
-      - zookeeper-1
-      - zookeeper-2
-      - zookeeper-3
+      zookeeper-1:
+        condition: service_healthy
+      zookeeper-2:
+        condition: service_healthy
+      zookeeper-3:
+        condition: service_healthy
     ports:
-      - "49092:49092"
+      - "9095:9095"
     environment:
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+      ALLOW_PLAINTEXT_LISTENER: yes
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9092,PLAINTEXT_HOST://localhost:49092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:9095
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
     user: root
+    networks:
+      - kafka-learning
     volumes:
       - ./kafka-data/kafka-3/data:/var/lib/kafka/data
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 5
   app:
     build: ./kafka_app
     container_name: app
     ports:
       - 5001:5001
+    networks:
+      - kafka-learning
     depends_on:
-      - kafka-1
-      - kafka-2
-      - kafka-3
-networks:
-    kafka-network:
-       driver: bridge
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+      kafka-3:
+        condition: service_healthy
