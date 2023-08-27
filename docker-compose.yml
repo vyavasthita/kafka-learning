@@ -145,41 +145,41 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
-  kafka-3:
-    image: confluentinc/cp-kafka:7.0.1
-    hostname: kafka-3
-    container_name: kafka-3
-    depends_on:
-      zookeeper-1:
-        condition: service_healthy
-      zookeeper-2:
-        condition: service_healthy
-      zookeeper-3:
-        condition: service_healthy
-    ports:
-      - "9095:9095"
-    environment:
-      KAFKA_BROKER_ID: 3
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
-      ALLOW_PLAINTEXT_LISTENER: yes
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:9095
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-    user: root
-    networks:
-      - kafka-learning
-    volumes:
-      - ./kafka-data/kafka-3/data:/var/lib/kafka/data
-    healthcheck:
-      test: nc -z localhost 9092 || exit -1
-      start_period: 15s
-      interval: 5s
-      timeout: 10s
-      retries: 5
+  # kafka-3:
+  #   image: confluentinc/cp-kafka:7.0.1
+  #   hostname: kafka-3
+  #   container_name: kafka-3
+  #   depends_on:
+  #     zookeeper-1:
+  #       condition: service_healthy
+  #     zookeeper-2:
+  #       condition: service_healthy
+  #     zookeeper-3:
+  #       condition: service_healthy
+  #   ports:
+  #     - "9095:9095"
+  #   environment:
+  #     KAFKA_BROKER_ID: 3
+  #     KAFKA_ZOOKEEPER_CONNECT: zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181
+  #     ALLOW_PLAINTEXT_LISTENER: yes
+  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:9095
+  #     KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+  #     KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  #     KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  #   user: root
+  #   networks:
+  #     - kafka-learning
+  #   volumes:
+  #     - ./kafka-data/kafka-3/data:/var/lib/kafka/data
+  #   healthcheck:
+  #     test: nc -z localhost 9092 || exit -1
+  #     start_period: 15s
+  #     interval: 5s
+  #     timeout: 10s
+  #     retries: 5
   app:
     build: ./kafka_app
     container_name: app
@@ -192,5 +192,7 @@ services:
         condition: service_healthy
       kafka-2:
         condition: service_healthy
-      kafka-3:
-        condition: service_healthy
+      # kafka-3:
+      #   condition: service_healthy
+    volumes:
+      - ./kafka_app:/app

@@ -8,12 +8,10 @@ RUN apk update \
     && apk add --no-cache mariadb-dev
 
 COPY requirements.txt .
-
 RUN pip install -r requirements.txt
-# RUN pip install mysqlclient
 
 COPY main.py .
 
-# CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5003", "--reload" ]
+# CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5001", "--reload" ]
 
 CMD [ "python", "main.py" ]

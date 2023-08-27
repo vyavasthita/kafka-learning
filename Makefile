@@ -13,6 +13,8 @@ clean:
 	docker compose down
 	docker container prune -f
 	docker image prune -f
+	docker network prune -f
+	docker volume prune -f
 
 	sudo rm -rf kafka-data/kafka-1/data
 	sudo rm -rf kafka-data/kafka-2/data

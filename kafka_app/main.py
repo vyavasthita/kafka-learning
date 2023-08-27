@@ -5,10 +5,9 @@ import json
 app = FastAPI()
 
 producer = KafkaProducer(
-    bootstrap_servers=["kafka:29092", "kafka:39092", "kafka:49092"],
+    bootstrap_servers=["kafka:9093", "kafka:9094"],
     value_serializer=lambda v: json.dumps(v).encode("utf-8"),
 )
-
 
 @app.route("/home")
 def home(name: str):
