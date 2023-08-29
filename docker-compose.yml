@@ -194,5 +194,5 @@ services:
         condition: service_healthy
       # kafka-3:
       #   condition: service_healthy
-    volumes:
-      - ./kafka_app:/app
+    # volumes:
+    #   - ./kafka_app:/app

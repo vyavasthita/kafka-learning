@@ -1,6 +1,8 @@
 # kafka-learning
 Learning Kafka
 
+Event driven architecture also works as common communication layer.
+Kafka stores data locally like cache to avoid network call.
 
 # References
 
@@ -10,10 +12,9 @@ Zookeeper ;-
 - It manages brokers and keeps metadata information about kafka cluster in the form of key value pair.
 - It helps in controller election in kafka cluster.
 
-
 Create topic;-
 
-kafka-topics --create --topic newtopic --bootstrap-server kafka-1:29092,kafka-2:39092,kafka-3:49092 --partitions 4 --replication-factor 2
+kafka-topics --create --topic mytopic --bootstrap-server kafka-1:9093,kafka-2:9094 --partitions 2 --replication-factor 1
 
 In Kafka, there is only one controller node.
 
